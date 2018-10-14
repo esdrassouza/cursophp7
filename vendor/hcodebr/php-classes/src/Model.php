@@ -14,8 +14,8 @@ class Model
   	 switch($method)
   	 {
 
-  	 	case"get":
-  	 	  $this->values[$fieldName];
+  	 	case "get":
+  	 	   return (isset($this->values[$fieldName])) ? $this->values[$fieldName] : NULL ;
   	 	  break;
 
   	 	case "set":
@@ -25,15 +25,13 @@ class Model
   	 	break;
   	 }
   }
-public function setData ($data = array())
-{
+  public function setData($data = array())
+     {
+        foreach ($data as $key => $value) {
 
-     foreach ($data as $key => $value) {
-     	
-     	$this->{"set".$key}($value);
+             $this->{"set". $key}($value);
+        }
      }
-
-   }
 
    public function getValues()
    {
