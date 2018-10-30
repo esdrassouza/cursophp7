@@ -4,124 +4,101 @@ namespace Hcode\Model;
 use \Hcode\DB\Sql;
 use \Hcode\Model;
 use \Hcode\Model\User;
+use \Hcode\Model\Product;
 
 
  class Cart extends Model
  {
- 	const SESSION = "Cart";
+ 	
+  const SESSION ="Cart";
 
-
-
- 	public static function getFromSession()
- 	{
+  public static function getFromSession()
+  {
+      
       $cart = new Cart();
-
-      if(isset($_SESSION[Cart::SESSION]) && $_SESSION[Cart::SESSION]['idcart'] > 0)
-      {
-
+      
+       if(isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] >0)
+       {
               $cart->get((int)$_SESSION[Cart::SESSION]['idcart']);
+       }
+       else{
 
-      }
-      else
-      {
+       	  $cart->getFromSessionID();
 
-                $cart->getFromSessionId();
+       	  if(!(int)$cart->getidcart() > 0)
+       	  {
+                    
+             $data =[
+                'dessessionid'=>session_id()
+             ];
 
-               if(!(int)$cart->getidcart() > 0 )
-               {
+             if(User::checkLogin(false))
+             {
+              $user = User::getFromSession();
 
-               	$data = [
-                   'dessessionid'=>session_id()
-               	];
-                 
+              $data['iduser'] = $user->getiduser();
+             }
+             $cart->setData($data);
+             $cart->save();
+             $cart->setToSession();
+       	  }
+       }
+      return $cart;
+  }
+  public function setToSession()
+  {
 
-               	if(User::checkLogin(false))
-               	{
-
-                      $user = User::getFromSession();
-
-                      $data['iduser'] = $user->getiduser();
-
-
-               	}
-
-               	$cart->setData($data);
-               	$cart->save();
-
-               	$cart->setToSession();
-               	 }
-
-      }
-  return $cart;
-}
-    public function setToSession()  {
-
-         $_SESSION[Cart::SESSION] = $this->getValues();
-
-  
-          }
-
-
-
-   	public function getFromSessionId()
- 	{
-
-        $sql = new Sql();
-
-       $results = $sql->select("SELECT * FROM tb_carts  WHERE dessessionid = :dessessionid",[
-              ':dessessionid'=>session_id()
-       ]);
-
-        if(count($results) > 0)
-          {
-       
-              $this->setData($results[0]);
-
-          }
-
-
- 	}
-
-
-
- 	public function get(int $idcart)
- 	{
-
-        $sql = new Sql();
-
-       $results = $sql->select("SELECT * FROM tb_carts  WHERE idcart = :idcart",[
-              ':idcart'=>$idcart
-       ]);
-     
-     if(count($results) > 0)
-     {
-       
-       $this->setData($results[0]);
-
-     }
- }
-
-  public function save()
+  	$_SESSION[Cart::SESSION] = $this->getValues();
+  }
+  public function getFromSessionID()
   {
 
   	$sql = new Sql();
 
-  	$results = $sql->select("CALL sp_carts_save(:idcart,:dessessionid,:iduser, :deszipcode, :vlfreight, :pnrdays)",[
-             
-
-             ":idcart"=>$this->getidcart(),
-             ":dessessionid"=>$this->getdessessionid(),
-             ":iduser"=>$this->getiduser(),
-             ":deszipcode"=>$this->getdeszipcode(),
-             ":vlfreight"=>$this->getvlfreight(),
-             ":pnrdays"=>$this->getprndays()
-         ]);
-
+  	$results = $sql->select("SELECT * FROM tb_cartsproducts WHERE dessessionid= :dessessionid",[
+          ':dessessionid'=>session_id()
+  	]);
+  
+  if(count($results) > 0 )
+  {
   	$this->setData($results[0]);
   }
+ }
 
+  public function get($idcart)
+  {
+
+  	$sql = new Sql();
+
+  	$results = $sql->select("SELECT * FROM tb_cartsproducts WHERE idcart = :idcart",[
+          ':idcart'=>$idcart
+  	]);
+if(count($results) > 0 )
+  {
+  	$this->setData($results[0]);
+  }
  }
 
 
 
- ?>
+ 	public function save()
+ 	{
+         
+         $sql = new Sql();
+
+          $results = $sql->select("CALL sp_carts_save(:idcart , :dessessionid, :iduser , :deszipcode , :vlfreight , :nrdays)",[
+
+             ':idcart'=>$this->getidcart(),
+             ':dessessionid'=>$this->getdessessionid(),
+             ':iduser'=>$this->getiduser(),
+             ':deszipcode'=>$this->getdeszipcode(),
+             ':vlfreight'=>$this->getvlfreight(),
+             ':nrdays'=>$this->getnrdays()
+         ]);
+
+         $this->setData($results[0]);
+
+ 	}
+
+ }
+?>
