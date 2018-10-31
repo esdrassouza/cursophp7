@@ -72,13 +72,9 @@ $page->setTpl("product-detail",[
 
 
 $app->get("/cart", function(){
-
      $cart = Cart::getFromSession();
      $page = new Page();
      $page->setTpl("cart");
-     
 });
-
-
 
 ?>

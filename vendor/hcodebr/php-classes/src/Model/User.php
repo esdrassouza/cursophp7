@@ -30,7 +30,7 @@ public static function getFromSession()
               ||
               !$_SESSION[User::SESSION]
               ||
-              !(int)$_SESSION[User::SESSION]["iduser"] > 0
+              !(int)$_SESSION[User::SESSION]['iduser'] > 0
             ){
 
               //Não esta logado
@@ -38,12 +38,12 @@ public static function getFromSession()
 
            }
            else{
-                    if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true )
+                    if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true)
                      {
 
                          return true;
 
-                     }else if( $inadmin === false)
+                     }else if($inadmin === false)
                      {
 
                       return true;
@@ -103,7 +103,7 @@ public static function getFromSession()
 
 	public static function verifyLogin($inadmin = true)
 	{
-		if( User::checkLogin($inadmin)){
+		if(User::checkLogin($inadmin)){
 
                header("Location: /admin/login");
                exit;
