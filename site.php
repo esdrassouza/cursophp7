@@ -1,4 +1,5 @@
 <?php 
+
 use \Hcode\Page;
 use \Hcode\Model\Product;
 use \Hcode\Model\Category;
@@ -70,14 +71,16 @@ $page->setTpl("product-detail",[
 
 });
 
-
 $app->get("/cart", function(){
-     $cart = Cart::getFromSession();
-     $page = new Page();
-     $page->setTpl("cart",
-    [
-          'cart'=>$cart->getValues(),
-          'products'=>$cart->getProducts()
+     
+    $cart = Cart::getFromSession(); 
+    $page = new Page();
+    
+
+    $page->setTpl("cart",[
+    'cart'=>$cart->getValues(),
+    'products'=>$cart->getProducts(),
+    'error'=>Cart::getMsgError()
     ]);
 });
 
@@ -94,11 +97,8 @@ $app->get("/cart/:idproduct/add", function($idproduct){
               $cart->addProduct($product);
 
          }
-
-        
-         header("Location: /cart");
+        header("Location: /cart");
          exit;
-
 });
 
 $app->get("/cart/:idproduct/minus", function($idproduct){
@@ -122,4 +122,14 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
          exit;
 
 });
+
+$app->post("/cart/freight", function(){
+             
+             $cart = Cart::getFromSession();
+             $cart->setFreight($_POST['zipcode']);
+             header("Location: /cart");
+             exit;
+
+});
+
 ?>
