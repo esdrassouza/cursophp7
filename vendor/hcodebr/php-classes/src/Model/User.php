@@ -11,6 +11,7 @@ class  User extends Model{
    const SECRET ="HcodePhp7_Secret";
    const ERROR ="UserError";
    const ERROR_REGISTER ="UserErrorRegister";
+   const SUCCESS="UserSuccess";
   
 public static function getFromSession()
   {
@@ -64,7 +65,7 @@ public static function getFromSession()
 
 		$sql =  new Sql();
 
-		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b ON a.idperson = b.idperson WHERE a.deslogin= :LOGIN", array(
        
           ":LOGIN"=>$login
 
@@ -85,7 +86,7 @@ public static function getFromSession()
 		{
 			$user = new User();
 
-         //  $data['desperson'] = utf8_encode($data['desperson']);
+          $data['desperson'] = utf8_encode($data['desperson']);
 
             $user->setData($data);
 
@@ -169,7 +170,7 @@ public static function getFromSession()
 
         $data = $results[0];
 
-        $data['desperson'] = utf8_encode($data['desperson']);
+       // $data['desperson'] = utf8_encode($data['desperson']);
 
         $this->setData($results[0]);
 
@@ -331,13 +332,13 @@ public static function validForgotDecrypt($code){
   
   public static function setError($msg)
  {
-      $_SESSION[User::ERROR_REGISTER] = $msg;
+      $_SESSION[User::ERROR] = $msg;
  }
 
 
 public static function getError()
 {
-   $msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER]  : "";
+   $msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR]  : "";
 
       User::clearError();
 
@@ -346,8 +347,34 @@ public static function getError()
 
 public static function clearError()
 {
+        $_SESSION[User::ERROR] = NULL;
+}
+
+
+  public static function setErrorRegister($msg)
+ {
+      $_SESSION[User::ERROR_REGISTER] = $msg;
+ }
+
+
+public static function getErrorRegister()
+{
+   $msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER]  : "";
+
+      User::clearError();
+
+   return $msg;
+}
+
+public static function clearErrorRegister()
+{
         $_SESSION[User::ERROR_REGISTER] = NULL;
 }
+
+
+
+
+
 
  public static function getPasswordHash($password)
   {
@@ -373,6 +400,27 @@ public static function clearError()
 
     return(count($result) > 0);
   }
+
+   public static function setSuccess($msg)
+ {
+      $_SESSION[User::SUCCESS] = $msg;
+ }
+
+
+public static function getSuccess()
+{
+   $msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS]  : "";
+
+      User::clearSuccess();
+
+   return $msg;
+}
+
+public static function clearSuccess()
+{
+        $_SESSION[User::SUCCESS] = NULL;
+}
+
 
 }
 
