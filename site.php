@@ -6,6 +6,8 @@ use \Hcode\Model\Category;
 use \Hcode\Model\Cart;
 use \Hcode\Model\Address;
 use \Hcode\Model\User;
+
+
 $app->get('/', function() {
 
 	
@@ -154,7 +156,9 @@ $app->get("/login", function(){
     $page = new Page();
 
     $page->setTpl("login", [
-       'error'=>User::getError()
+       'error'=>User::getError(),
+       'errorRegister'=>User::getError(),
+       'registerValues'=>(isset($_SESSION['registerValues'])) ? $_SESSION['registerValues'] : ['name'=>'','email'=>'','phone'=>'']
     
     ]);
 
@@ -180,4 +184,68 @@ $app->get("/logout", function(){
  exit;
 
 });
+
+$app->post("/register" , function(){
+
+ 
+
+  $_SESSION['registerValues'] = $_POST;
+
+
+ 
+ if(!isset($_POST['name']) || $_POST['name'] == ''){
+
+
+	User::setError("Informe seu nome!");
+	header("Location: /login");
+	exit;
+}
+
+ 
+ if(!isset($_POST['email']) || $_POST['email'] == ''){
+
+
+	User::setError("Informe seu e-mail!");
+	header("Location: /login");
+	exit;
+}
+
+  
+ if(!isset($_POST['password']) || $_POST['password'] == ''){
+
+
+	User::setError("Informe seu password!");
+	header("Location: /login");
+	exit;
+}
+ 
+if(User::checkLoginExist($_POST['email']) === true){
+
+ User::setError("Este endereço de e-mail já esta sendo usado por outro usuário!");
+	header("Location: /login");
+	exit;
+
+}
+
+ $user = new User();
+
+ $user->setData([
+        
+        'inadmin'=>0,
+        'deslogin'=>$_POST['email'],
+        'desperson'=>$_POST['name'],
+        'desemail'=>$_POST['email'],
+        'despassword'=>$_POST['password'],
+        'nrphone'=>$_POST['phone']
+
+ ]);
+
+ $user->save();
+ User::login($_POST['email'], $_POST['password']);
+
+ header("Location: /checkout");
+ exit;
+
+});
+
 ?>

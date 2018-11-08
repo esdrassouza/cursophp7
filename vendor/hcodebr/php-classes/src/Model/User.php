@@ -341,19 +341,7 @@ public static function clearError()
         $_SESSION[User::ERROR_REGISTER] = NULL;
 }
 
-
-public static function setErrorRegister($msg){
-
-  $_SESSION[User::ERROR_REGISTER] = $msg;
-  
-
-  }
-
-
-
-
-
-  public static function getPasswordHash($password)
+ public static function getPasswordHash($password)
   {
 
     return password_hash($password, PASSWORD_DEFAULT,[
@@ -363,6 +351,20 @@ public static function setErrorRegister($msg){
     ]);
   }
   
+
+
+  public static function checkLoginExist($login)
+  {
+
+    $sql = new Sql();
+
+    $result = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", [
+
+       ':deslogin'=>$login
+    ]);
+
+    return(count($result) > 0);
+  }
 
 }
 
